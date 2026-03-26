@@ -1,0 +1,6 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\ds1307.obj",
+".\Objects\Seg.obj" 
+TO ".\Objects\HUYF" 
+PRINT(".\Listings\HUYF.m51") RAMSIZE(256) 

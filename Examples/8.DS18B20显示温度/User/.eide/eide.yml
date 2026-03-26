@@ -1,0 +1,59 @@
+version: "4.1"
+name: HUYF
+type: C51
+deviceName: null
+packDir: null
+srcDirs: []
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders:
+    - name: User
+      files:
+        - path: STARTUP.A51
+        - path: main.c
+      folders: []
+    - name: Driver
+      files:
+        - path: ../Driver/onewire.c
+        - path: ../Driver/onewire.h
+        - path: ../Driver/Seg.c
+        - path: ../Driver/Seg.h
+      folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: 8ed2585574ac25ba0e3ca0dd14acdac3
+targets:
+  Target_1:
+    cppPreprocessAttrs:
+      defineList: []
+      incList:
+        - E:/Tools/Keil5/MDK/C51/INC/STC
+        - ../Driver
+      libList: []
+    excludeList: []
+    toolchain: Keil_C51
+    toolchainConfigMap:
+      Keil_C51:
+        options:
+          version: 2
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            optimization-level: level-8
+            optimization-type: SPEED
+          global:
+            ram-mode: SMALL
+            rom-mode: LARGE
+          linker:
+            misc-controls: ""
+            output-format: elf
+            remove-unused: true
+    uploadConfigMap:
+      Custom:
+        bin: ""
+        commandLine: ""
+        eraseChipCommand: ""
+    uploader: Custom
