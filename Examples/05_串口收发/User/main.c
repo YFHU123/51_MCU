@@ -16,9 +16,10 @@ unsigned char Uart_Slow_Down;//串口减速专用变量
 unsigned char Uart_Recv[10];//串口接收数据储存数组
 unsigned char Uart_Recv_Index;//串口接收数组指针
 unsigned char Uart_Send[10];//串口接收数据储存数组 
+
 unsigned int cnt = 0;
-unsigned int Timer = 0;
-bit Flag = 0;
+unsigned int Uart_Timer = 0;
+bit Uart_Flag = 0;
 
 /* 按键处理函数 */
 void Key_Proc()
@@ -32,17 +33,40 @@ void Key_Proc()
     Key_Old = Key_Val;//传递旧值
 
 	/* 按键操作逻辑 */
-	if(Key_Down == 1) LED1 = ~LED1;
+	if(Key_Down == 1)
+	{
+		cnt++;
+		printf("cnt=%d\r\n",cnt);
+	}
 
 }
 
 /* 串口处理函数 */
 void Uart_Proc()
 {
-	if(Uart_Slow_Down) return;
-	Uart_Slow_Down = 1;//串口减速程序	
+    if(Uart_Slow_Down) return;
+    Uart_Slow_Down = 1;
 
-	
+    // 当满足：接收到数据 且 接收已经停止
+    if((Uart_Recv_Index > 0) && (Uart_Flag == 0))
+    {
+        // --- 回传 ---
+        Uart_Send_String(Uart_Recv);
+        Uart_Send_String("\r\n");
+
+        // --- 逻辑判断部分 ---
+        if(strcmp(Uart_Recv, "ON") == 0) 
+        {
+            LED1 = 0;
+        }
+        else if(strcmp(Uart_Recv, "OFF") == 0)
+        {
+            LED1 = 1;
+        }
+
+        Uart_Recv_Index = 0; 
+        memset(Uart_Recv, 0, sizeof(Uart_Recv)); 
+    }
 }
 
 /* 定时器0初始化函数 */
@@ -58,7 +82,21 @@ void Timer0_Init(void)		//1毫秒@12.000MHz
 	EA = 1;					//开总中断
 }
 
- 
+/* 串口1中断服务函数 */
+void Uart1Server() interrupt 4
+{
+    if(RI == 1) 
+    {
+        RI = 0;
+        if(Uart_Recv_Index < 10) 
+        {
+            Uart_Recv[Uart_Recv_Index++] = SBUF;
+        }
+        Uart_Flag = 1; 
+        Uart_Timer = 0; // 只要有数据进来，就重置计时器（用于超时检测）
+    }
+}
+
 /* 定时器0中断服务函数 */
 void Timer0Sever() interrupt 1  //1ms
 {
@@ -69,18 +107,15 @@ void Timer0Sever() interrupt 1  //1ms
     if(++Key_Slow_Down == 10) Key_Slow_Down = 0;//按键轮询 10ms
 	if(++Uart_Slow_Down == 200) Uart_Slow_Down = 0;//串口轮询 200ms
 
-
-}
-
-/* 串口1中断服务函数 */
-void Uart1Server() interrupt 4
-{
-	if(RI == 1) //串口接收数据
-	{
-		Uart_Recv[Uart_Recv_Index] = SBUF;
-		Uart_Recv_Index++;
-		RI = 0;
-	}
+	// --- 必须补上这部分逻辑 ---
+    if(Uart_Flag == 1) // 如果串口正在接收
+    {
+        if(++Uart_Timer >= 10) // 超过10ms没有新数据进来
+        {
+            Uart_Flag = 0;     // 判定为一帧接收结束
+            Uart_Timer = 0;
+        }
+    }
 }
 
 void main() 
@@ -94,7 +129,7 @@ void main()
     while (1)
 	{
 		Uart_Proc();
-		
+		Key_Proc();
     }
 }
 

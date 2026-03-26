@@ -15,8 +15,8 @@ virtualFolder:
       folders: []
     - name: Driver
       files:
-        - path: ../Driver/Seg.c
-        - path: ../Driver/Seg.h
+        - path: ../Driver/LCD1602.c
+        - path: ../Driver/LCD1602.h
       folders: []
 dependenceList: []
 outDir: build

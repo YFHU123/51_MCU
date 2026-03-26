@@ -9,7 +9,7 @@ extern unsigned char code string1[];
 void main() {
     Init_74HC595(); 
     while(1) {
-        // MatrixLED_ShowFrame(smile);
-        MatrixLED_Scrolling(Animation, 48, 15);
+        MatrixLED_ShowFrame(smile);
+        //MatrixLED_Scrolling(Animation, 48, 15);
     }
 }
