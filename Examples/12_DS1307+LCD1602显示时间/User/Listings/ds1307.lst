@@ -1,0 +1,102 @@
+C51 COMPILER V9.60.7.0   DS1307                                                            03/16/2026 17:25:19 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DS1307
+OBJECT MODULE PLACED IN .\Objects\ds1307.obj
+COMPILER INVOKED BY: E:\TOOLS\Keil5\MDK\C51\BIN\C51.EXE ..\Driver\ds1307.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver) DE
+                    -BUG OBJECTEXTEND PRINT(.\Listings\ds1307.lst) OBJECT(.\Objects\ds1307.obj)
+
+line level    source
+
+   1          #include <intrins.h>
+   2          #include "ds1307.h"
+   3          
+   4          //引脚定义
+   5          sbit SCL = P2^1; 
+   6          sbit SDA = P2^0;
+   7          
+   8          /* IIC 总线基础信号 */
+   9          void IIC_Start() {
+  10   1          SDA = 1; SCL = 1; _nop_();
+  11   1          SDA = 0; _nop_();
+  12   1          SCL = 0;
+  13   1      }
+  14          
+  15          void IIC_Stop() {
+  16   1          SDA = 0; SCL = 1; _nop_();
+  17   1          SDA = 1; _nop_();
+  18   1      }
+  19          
+  20          void IIC_SendByte(unsigned char dat) {
+  21   1          unsigned char i;
+  22   1          for(i=0; i<8; i++) {
+  23   2              SDA = dat >> 7; // IIC 高位在前
+  24   2              dat <<= 1;
+  25   2              SCL = 1; _nop_(); SCL = 0;
+  26   2          }
+  27   1          SDA = 1; SCL = 1; _nop_(); SCL = 0; // 释放 SDA 等待应答
+  28   1      }
+  29          
+  30          unsigned char IIC_RecvByte() {
+  31   1          unsigned char i, dat = 0;
+  32   1          SDA = 1; 
+  33   1          for(i=0; i<8; i++) {
+  34   2              SCL = 1; _nop_();
+  35   2              dat <<= 1;
+  36   2              if(SDA) dat |= 0x01;
+  37   2              SCL = 0;
+  38   2          }
+  39   1          return dat;
+  40   1      }
+  41          
+  42          /* DS1307 读写封装 */
+  43          void Write_Ds1307_Byte(unsigned char addr, unsigned char dat) {
+  44   1          IIC_Start();
+  45   1          IIC_SendByte(0xD0); // DS1307 写地址
+  46   1          IIC_SendByte(addr); 
+  47   1          IIC_SendByte(dat);  
+  48   1          IIC_Stop();
+  49   1      }
+  50          
+  51          unsigned char Read_Ds1307_Byte(unsigned char addr) {
+  52   1          unsigned char dat;
+  53   1          IIC_Start();
+  54   1          IIC_SendByte(0xD0); 
+C51 COMPILER V9.60.7.0   DS1307                                                            03/16/2026 17:25:19 PAGE 2   
+
+  55   1          IIC_SendByte(addr);
+  56   1          IIC_Start();        // 重启总线进行读取
+  57   1          IIC_SendByte(0xD1); // DS1307 读地址
+  58   1          dat = IIC_RecvByte();
+  59   1          IIC_Stop();
+  60   1          return dat;
+  61   1      }
+  62          
+  63          /* 设置时间：数组格式为 [时, 分, 秒]，必须是 BCD 码 */
+  64          void Set_Rtc(unsigned char *ucRtc) {
+  65   1          // DS1307 没有写保护寄存器，但需要确保秒寄存器 CH 位为 0 以启动时钟
+  66   1          Write_Ds1307_Byte(0x02, ucRtc[0]); // 时
+  67   1          Write_Ds1307_Byte(0x01, ucRtc[1]); // 分
+  68   1          Write_Ds1307_Byte(0x00, ucRtc[2]); // 秒 (同时会清除 CH 位启动时钟)
+  69   1      }
+  70          
+  71          /* 读取时间：数组格式为 [时, 分, 秒] */
+  72          void Read_Rtc(unsigned char *ucRtc) {
+  73   1          ucRtc[0] = Read_Ds1307_Byte(0x02); // 时
+  74   1          ucRtc[1] = Read_Ds1307_Byte(0x01); // 分
+  75   1          ucRtc[2] = Read_Ds1307_Byte(0x00); // 秒
+  76   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    197    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

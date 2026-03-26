@@ -1,0 +1,99 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              03/16/2026 17:12:46 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\TOOLS\Keil5\MDK\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver) DEBUG OBJECTEX
+                    -TEND PRINT(.\Listings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /* 头文件声明区 */
+   2          #include <reg52.h>
+   3          #include <intrins.h>
+   4          #include "Seg.h"
+   5          #include "Key.h"
+   6          #include "ds1307.h"
+   7          
+   8          /* 变量声明区 */
+   9          unsigned char Seg_Slow_Down;//数码管减速
+  10          unsigned char Seg_Pos;//数码管扫描专用变量
+  11          unsigned char Seg_Buf[8] = {16,16,16,16,16,16,16,16};//数码管显示数组 默认熄灭
+  12          unsigned char Seg_Point[8] = {0,0,0,0,0,0,0,0};//数码管小数点显示数组 默认熄灭
+  13          
+  14          /* 时间 */
+  15          unsigned char ucRtc[3] = {0x13, 0x59, 0x50}; // 初始化时间13:59:50
+  16          
+  17          /* 信息处理函数 */
+  18          void Seg_Proc()
+  19          {
+  20   1          if (Seg_Slow_Down) return;
+  21   1          Seg_Slow_Down = 1;
+  22   1      
+  23   1          Read_Rtc(ucRtc);//读取时间到 ucRtc 数组
+  24   1      
+  25   1          //BCD转换为十进制显示
+  26   1          Seg_Buf[0] = ucRtc[0] / 16;
+  27   1          Seg_Buf[1] = ucRtc[0] % 16;
+  28   1          Seg_Buf[2] = 17; //-
+  29   1          Seg_Buf[3] = ucRtc[1] / 16;
+  30   1          Seg_Buf[4] = ucRtc[1] % 16;
+  31   1          Seg_Buf[5] = 17; //-
+  32   1          Seg_Buf[6] = ucRtc[2] / 16;
+  33   1          Seg_Buf[7] = ucRtc[2] % 16;
+  34   1      }
+  35          
+  36          
+  37          /* 定时器0初始化函数 */
+  38          void Timer0_Init(void)          //1毫秒@12.000MHz
+  39          {
+  40   1              TMOD &= 0xF0;                   //设置定时器模式
+  41   1              TMOD |= 0x01;                   //设置定时器模式
+  42   1              TL0 = 0x18;                             //设置定时初始值
+  43   1              TH0 = 0xFC;                             //设置定时初始值
+  44   1              TF0 = 0;                                //清除TF0标志
+  45   1              TR0 = 1;                                //定时器0开始计时
+  46   1          ET0 = 1;                            //打开定时器0中断
+  47   1          EA = 1;                                     //打开总中断
+  48   1      }
+  49          
+  50          /* 定时器0中断服务函数 */
+  51          void Timer0Sever() interrupt 1
+  52          {
+  53   1          TL0 = 0x18;                         //设置定时初始值
+  54   1              TH0 = 0xFC;                             //设置定时初始值
+C51 COMPILER V9.60.7.0   MAIN                                                              03/16/2026 17:12:46 PAGE 2   
+
+  55   1      
+  56   1          if(++Seg_Slow_Down == 200) Seg_Slow_Down = 0;//按键轮询 10ms
+  57   1          if(++Seg_Pos == 8) Seg_Pos = 0;//0-7之间循环扫描
+  58   1      
+  59   1          Seg_Disp(Seg_Pos,Seg_Buf[Seg_Pos],Seg_Point[Seg_Pos]);//动态显示
+  60   1      }
+  61          
+  62          
+  63          
+  64          /* 主函数 */
+  65          void main()
+  66          {
+  67   1          Timer0_Init();//定时器0初始化
+  68   1          Set_Rtc(ucRtc); // 设置初始时间
+  69   1          while(1)
+  70   1          {
+  71   2              Seg_Proc();
+  72   2          }
+  73   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    200    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     21    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
