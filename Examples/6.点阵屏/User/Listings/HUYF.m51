@@ -1,0 +1,330 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    03/16/2026  17:41:55  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+E:\TOOLS\KEIL5\MDK\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\main.obj, .\Objects\Matrix.obj TO .\Objects\HUYF PR
+>> INT (.\Listings\HUYF.m51) RAMSIZE (256) DISABLEWARNING (16)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\main.obj (MAIN)
+  .\Objects\Matrix.obj (MATRIX)
+  E:\TOOLS\KEIL5\MDK\C51\LIB\C51S.LIB (?C_INIT)
+  E:\TOOLS\KEIL5\MDK\C51\LIB\C51S.LIB (?C?CLDOPTR)
+  E:\TOOLS\KEIL5\MDK\C51\LIB\C51S.LIB (?C?UIDIV)
+
+
+LINK MAP OF MODULE:  .\Objects\HUYF (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0015H     UNIT         ?DT?MATRIX
+            DATA    001DH     0009H     UNIT         ?DT?_MATRIX16X16_SCROLLING?MATRIX
+            DATA    0026H     0007H     UNIT         _DATA_GROUP_
+            DATA    002DH     0004H     UNIT         ?DT?_MATRIXLED_SHOWFRAME?MATRIX
+            DATA    0031H     0004H     UNIT         ?DT?_MATRIX16X16_SHOWCOLUMN?MATRIX
+            IDATA   0035H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0090H     UNIT         ?CO?MATRIX
+            CODE    0093H     008CH     UNIT         ?C_C51STARTUP
+            CODE    011FH     008BH     UNIT         ?PR?_MATRIX16X16_SHOWCOLUMN?MATRIX
+            CODE    01AAH     0085H     UNIT         ?PR?_MATRIX16X16_SCROLLING?MATRIX
+            CODE    022FH     0082H     UNIT         ?C?LIB_CODE
+            CODE    02B1H     0081H     UNIT         ?PR?_MATRIXLED_SCROLLING?MATRIX
+            CODE    0332H     002BH     UNIT         ?PR?_SHIFTBYTE?MATRIX
+            CODE    035DH     002AH     UNIT         ?PR?_MATRIXLED_SHOWCOLUMN?MATRIX
+            CODE    0387H     0028H     UNIT         ?PR?_MATRIXLED_SHOWFRAME?MATRIX
+            CODE    03AFH     0022H     UNIT         ?C_INITSEG
+            CODE    03D1H     0013H     UNIT         ?PR?MAIN?MAIN
+            CODE    03E4H     0007H     UNIT         ?PR?INIT_74HC595?MATRIX
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\HUYF (?C_STARTUP)
+
+
+SEGMENT                                      DATA_GROUP 
+  +--> CALLED SEGMENT                      START    LENGTH
+----------------------------------------------------------
+?C_C51STARTUP                              -----    -----
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/16/2026  17:41:55  PAGE 2
+
+
+
+?PR?MAIN?MAIN                              -----    -----
+  +--> ?PR?INIT_74HC595?MATRIX
+  +--> ?CO?MATRIX
+  +--> ?PR?_MATRIXLED_SCROLLING?MATRIX
+
+?PR?_MATRIXLED_SCROLLING?MATRIX            0026H    0007H
+  +--> ?PR?_MATRIXLED_SHOWCOLUMN?MATRIX
+
+?PR?_MATRIXLED_SHOWCOLUMN?MATRIX           -----    -----
+  +--> ?PR?_SHIFTBYTE?MATRIX
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\HUYF (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0093H         SEGMENT       ?C_C51STARTUP
+  I:0035H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0096H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0093H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0093H         LINE#         133
+  C:0095H         LINE#         134
+  C:0096H         LINE#         135
+  C:0097H         LINE#         136
+  C:0099H         LINE#         185
+  C:009CH         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/16/2026  17:41:55  PAGE 3
+
+
+  D:00A8H         PUBLIC        IE
+  D:00B8H         PUBLIC        IP
+  C:03D1H         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          MAIN
+  C:03D1H         LINE#         9
+  C:03D1H         LINE#         10
+  C:03D4H         LINE#         11
+  C:03D4H         LINE#         13
+  C:03E2H         LINE#         14
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        MATRIX
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  D:000BH         SYMBOL        Count
+  D:00A8H         PUBLIC        IE
+  C:03E4H         PUBLIC        Init_74HC595
+  B:0090H.7       PUBLIC        EN
+  D:000CH         PUBLIC        heart
+  C:0332H         PUBLIC        _ShiftByte
+  D:00B8H         PUBLIC        IP
+  D:0014H         PUBLIC        smile
+  C:0003H         PUBLIC        Animation
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  C:011FH         PUBLIC        _Matrix16x16_ShowColumn
+  C:0387H         PUBLIC        _MatrixLED_ShowFrame
+  C:035DH         PUBLIC        _MatrixLED_ShowColumn
+  C:0033H         PUBLIC        string1
+  C:01AAH         PUBLIC        _Matrix16x16_Scrolling
+  B:00A0H.2       PUBLIC        RCK
+  B:00A0H.1       PUBLIC        SCK
+  C:02B1H         PUBLIC        _MatrixLED_Scrolling
+  D:00C8H         PUBLIC        T2CON
+  D:001CH         SYMBOL        Offset
+  B:00A0H.0       PUBLIC        SER
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          INIT_74HC595
+  C:03E4H         LINE#         14
+  C:03E4H         LINE#         15
+  C:03E6H         LINE#         16
+  C:03E8H         LINE#         17
+  C:03EAH         LINE#         18
+  -------         ENDPROC       INIT_74HC595
+  -------         PROC          _SHIFTBYTE
+  D:0005H         SYMBOL        Byte
+  -------         DO            
+  D:0004H         SYMBOL        i
+  -------         ENDDO         
+  C:0332H         LINE#         23
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/16/2026  17:41:55  PAGE 4
+
+
+  C:0334H         LINE#         24
+  C:0334H         LINE#         26
+  C:0336H         LINE#         27
+  C:0354H         LINE#         28
+  C:0356H         LINE#         29
+  C:0358H         LINE#         30
+  C:035CH         LINE#         31
+  -------         ENDPROC       _SHIFTBYTE
+  -------         PROC          _MATRIXLED_SHOWCOLUMN
+  D:0007H         SYMBOL        Column
+  D:0005H         SYMBOL        Data
+  -------         DO            
+  D:0002H         SYMBOL        ColumnSelect
+  D:0007H         SYMBOL        RowData
+  -------         ENDDO         
+  C:035DH         LINE#         38
+  C:035DH         LINE#         39
+  C:035DH         LINE#         40
+  C:0369H         LINE#         41
+  C:036CH         LINE#         43
+  C:036FH         LINE#         44
+  C:0374H         LINE#         45
+  C:0378H         LINE#         50
+  C:037DH         LINE#         51
+  C:0382H         LINE#         52
+  C:0386H         LINE#         53
+  -------         ENDPROC       _MATRIXLED_SHOWCOLUMN
+  -------         PROC          _MATRIXLED_SHOWFRAME
+  D:002DH         SYMBOL        frame
+  -------         DO            
+  D:0030H         SYMBOL        i
+  -------         ENDDO         
+  C:0387H         LINE#         60
+  C:038DH         LINE#         61
+  C:038DH         LINE#         63
+  C:0390H         LINE#         64
+  C:0390H         LINE#         65
+  C:03A5H         LINE#         66
+  C:03AEH         LINE#         67
+  -------         ENDPROC       _MATRIXLED_SHOWFRAME
+  -------         PROC          _MATRIXLED_SCROLLING
+  D:0026H         SYMBOL        pArray
+  D:0029H         SYMBOL        ArrayLen
+  D:002AH         SYMBOL        Speed
+  -------         DO            
+  D:002BH         SYMBOL        i
+  D:0004H         SYMBOL        j
+  D:0005H         SYMBOL        Data
+  D:002CH         SYMBOL        temp
+  -------         ENDDO         
+  C:02B1H         LINE#         76
+  C:02B9H         LINE#         77
+  C:02B9H         LINE#         81
+  C:02BCH         LINE#         82
+  C:02BCH         LINE#         83
+  C:02D9H         LINE#         84
+  C:02DCH         LINE#         85
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/16/2026  17:41:55  PAGE 5
+
+
+  C:02DDH         LINE#         86
+  C:02DDH         LINE#         87
+  C:0301H         LINE#         88
+  C:0305H         LINE#         89
+  C:030CH         LINE#         90
+  C:0315H         LINE#         92
+  C:0317H         LINE#         93
+  C:031EH         LINE#         94
+  C:031EH         LINE#         95
+  C:0321H         LINE#         96
+  C:0323H         LINE#         98
+  C:032EH         LINE#         99
+  C:032EH         LINE#         100
+  C:0331H         LINE#         101
+  C:0331H         LINE#         102
+  C:0331H         LINE#         103
+  -------         ENDPROC       _MATRIXLED_SCROLLING
+  -------         PROC          _MATRIX16X16_SHOWCOLUMN
+  D:0007H         SYMBOL        Column
+  D:0031H         SYMBOL        DataL
+  D:0032H         SYMBOL        DataH
+  -------         DO            
+  D:0033H         SYMBOL        RowSelect
+  D:0005H         SYMBOL        i
+  D:0002H         SYMBOL        tempL
+  D:0001H         SYMBOL        tempH
+  -------         ENDDO         
+  C:011FH         LINE#         111
+  C:0123H         LINE#         112
+  C:0123H         LINE#         113
+  C:013AH         LINE#         114
+  C:013DH         LINE#         117
+  C:013EH         LINE#         118
+  C:0165H         LINE#         119
+  C:018CH         LINE#         120
+  C:0190H         LINE#         123
+  C:0196H         LINE#         126
+  C:019BH         LINE#         129
+  C:01A0H         LINE#         132
+  C:01A5H         LINE#         134
+  C:01A9H         LINE#         140
+  -------         ENDPROC       _MATRIX16X16_SHOWCOLUMN
+  -------         PROC          _MATRIX16X16_SCROLLING
+  D:001DH         SYMBOL        pArray
+  D:0020H         SYMBOL        TotalLen
+  D:0022H         SYMBOL        Speed
+  -------         DO            
+  D:0008H         SYMBOL        ScrollOffset
+  D:000AH         SYMBOL        SpeedCount
+  D:0023H         SYMBOL        i
+  D:0024H         SYMBOL        rowindex
+  -------         ENDDO         
+  C:01AAH         LINE#         142
+  C:01B4H         LINE#         143
+  C:01B4H         LINE#         149
+  C:01B7H         LINE#         150
+  C:01B7H         LINE#         153
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  03/16/2026  17:41:55  PAGE 6
+
+
+  C:01D6H         LINE#         156
+  C:01FBH         LINE#         157
+  C:0204H         LINE#         159
+  C:0206H         LINE#         160
+  C:020DH         LINE#         161
+  C:020DH         LINE#         162
+  C:0210H         LINE#         163
+  C:0218H         LINE#         165
+  C:0229H         LINE#         166
+  C:0229H         LINE#         167
+  C:022EH         LINE#         168
+  C:022EH         LINE#         169
+  C:022EH         LINE#         170
+  -------         ENDPROC       _MATRIX16X16_SCROLLING
+  -------         ENDMOD        MATRIX
+
+  -------         MODULE        ?C?CLDOPTR
+  C:022FH         PUBLIC        ?C?CLDOPTR
+  -------         ENDMOD        ?C?CLDOPTR
+
+  -------         MODULE        ?C?UIDIV
+  C:025CH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+Program Size: data=54.0 xdata=0 code=1003
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

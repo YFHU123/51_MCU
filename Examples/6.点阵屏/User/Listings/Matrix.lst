@@ -1,0 +1,200 @@
+C51 COMPILER V9.60.7.0   MATRIX                                                            03/16/2026 17:41:44 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MATRIX
+OBJECT MODULE PLACED IN .\Objects\Matrix.obj
+COMPILER INVOKED BY: E:\TOOLS\Keil5\MDK\C51\BIN\C51.EXE ..\Driver\Matrix.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver) DE
+                    -BUG OBJECTEXTEND PRINT(.\Listings\Matrix.lst) OBJECT(.\Objects\Matrix.obj)
+
+line level    source
+
+   1          #include "Matrix.h"
+   2          #include "font.h"
+   3          
+   4          sbit SER = P2^0;//数据输入
+   5          sbit SCK = P2^1;//时钟信号
+   6          sbit RCK = P2^2;//锁存信号
+   7          sbit EN = P1^7;//使能
+   8          
+   9          // 定义底层静态变量，用于记录滚动状态
+  10          static unsigned char Offset = 0;// 滚动的偏移位置
+  11          static unsigned char Count = 0;// 速度计数器
+  12          
+  13          
+  14          void Init_74HC595() {
+  15   1          EN = 0; 
+  16   1          SCK = 0;
+  17   1          RCK = 0;
+  18   1      }
+  19          
+  20          /**
+  21            * @brief 写入 74HC595 核心函数（不锁存，仅移位）
+  22            */
+  23          void ShiftByte(unsigned char Byte) 
+  24          {
+  25   1          unsigned char i;
+  26   1          for(i=0; i<8; i++) {
+  27   2              SER = (Byte & (0x80 >> i)) ? 1 : 0;
+  28   2              SCK = 1; 
+  29   2              SCK = 0;
+  30   2          }
+  31   1      }
+  32          
+  33          /**
+  34            * @brief 双 74HC595 级联驱动函数
+  35            * @param ColumnSelect 列选数据（阳极）
+  36            * @param RowData 行数据（阴极，所以需要取反）
+  37            */
+  38          void MatrixLED_ShowColumn(unsigned char Column, unsigned char Data) 
+  39          {
+  40   1          unsigned char ColumnSelect = (0x80 >> Column);
+  41   1          unsigned char RowData = ~Data;
+  42   1      
+  43   1          ShiftByte(RowData);      
+  44   1          ShiftByte(ColumnSelect); 
+  45   1          RCK = 1;RCK = 0;//锁存信号
+  46   1      
+  47   1         // Delay1ms(1); // 扫描暂留
+  48   1      
+  49   1          //消隐
+  50   1          ShiftByte(0x00);
+  51   1          ShiftByte(0x00);
+  52   1          RCK = 1; RCK = 0;
+  53   1      }
+  54          
+C51 COMPILER V9.60.7.0   MATRIX                                                            03/16/2026 17:41:44 PAGE 2   
+
+  55          
+  56          /**
+  57            * @brief  显示一帧数据的封装函数
+  58            * @param  frame 指向8字节点阵数据的指针
+  59            */
+  60          void MatrixLED_ShowFrame(unsigned char *frame)
+  61          {
+  62   1          unsigned char i;
+  63   1          for(i = 0; i < 8; i++)
+  64   1          {
+  65   2              MatrixLED_ShowColumn(i, frame[i]);
+  66   2          }
+  67   1      }
+  68          
+  69          /**
+  70           * @brief  滚动显示指定数组内容
+  71           * 
+  72           * @param pArray 指向要滚动显示的数据数组
+  73           * @param ArrayLen 数组长度
+  74           * @param Speed 滚动速度（越大越慢）
+  75           */
+  76          void MatrixLED_Scrolling(unsigned char *pArray, unsigned char ArrayLen, unsigned char Speed)
+  77          {
+  78   1          unsigned char i, j;
+  79   1          unsigned char Data, temp;
+  80   1          
+  81   1          for(i = 0; i < 8; i++)
+  82   1          {
+  83   2              Data = pArray[(7 - i) + Offset]; 
+  84   2              temp = 0;
+  85   2              for(j = 0; j < 8; j++)
+  86   2              {
+  87   3                  if(Data & (0x01 << j)) temp |= (0x80 >> j);
+  88   3              }
+  89   2              MatrixLED_ShowColumn(i, temp);
+  90   2          }
+  91   1      
+  92   1          Count++;
+  93   1          if(Count > Speed)
+  94   1          {
+  95   2              Count = 0;
+  96   2              Offset++; 
+  97   2              
+  98   2              if(Offset > (ArrayLen - 8))
+  99   2              {
+ 100   3                  Offset = 0; 
+ 101   3              }
+ 102   2          }
+ 103   1      }
+ 104          
+ 105          /**
+ 106            * @brief 16x16 点阵显示核心函数（自动修正左右反置与镜像）
+ 107            * @param Column 扫描行号 (0-15)
+ 108            * @param DataL  左半部分数据字节
+ 109            * @param DataH  右半部分数据字节
+ 110            */
+ 111          void Matrix16x16_ShowColumn(unsigned char Column, unsigned char DataL, unsigned char DataH) 
+ 112          {
+ 113   1          unsigned int RowSelect = ~(0x0001 << Column); 
+ 114   1          unsigned char i, tempL = 0, tempH = 0;
+ 115   1      
+ 116   1          // 将取模软件的高位在前转为低位在前，匹配 595 输出顺序
+C51 COMPILER V9.60.7.0   MATRIX                                                            03/16/2026 17:41:44 PAGE 3   
+
+ 117   1          for(i = 0; i < 8; i++) {
+ 118   2              if(DataL & (0x01 << i)) tempL |= (0x80 >> i);
+ 119   2              if(DataH & (0x01 << i)) tempH |= (0x80 >> i);
+ 120   2          }
+ 121   1      
+ 122   1          // 1. 发送行选高字节 (挤到 U5)
+ 123   1          ShiftByte((unsigned char)(RowSelect >> 8));   
+ 124   1          
+ 125   1          // 2. 发送行选低字节 (挤到 U4)
+ 126   1          ShiftByte((unsigned char)(RowSelect & 0xFF)); 
+ 127   1      
+ 128   1          // 3. 先发右半边数据 (挤到 U3)
+ 129   1          ShiftByte(tempH); 
+ 130   1      
+ 131   1          // 4. 后发左半边数据 (留在 U2)
+ 132   1          ShiftByte(tempL); 
+ 133   1      
+ 134   1          RCK = 1; RCK = 0; // 锁存显示
+ 135   1      
+ 136   1          // // --- 消隐处理 (解决重影) ---
+ 137   1          // ShiftByte(0xFF); ShiftByte(0xFF); // 行熄灭
+ 138   1          // ShiftByte(0x00); ShiftByte(0x00); // 列断电
+ 139   1          // RCK = 1; RCK = 0;
+ 140   1      }
+ 141          
+ 142          void Matrix16x16_Scrolling(unsigned char *pArray, unsigned int TotalLen, unsigned char Speed)
+ 143          {
+ 144   1          static unsigned int ScrollOffset = 0; // 改为 int，防止多字滚动时超过 255
+ 145   1          static unsigned char SpeedCount = 0;   
+ 146   1          unsigned char i;
+ 147   1          unsigned int rowindex;
+ 148   1      
+ 149   1          for(i = 0; i < 16; i++)
+ 150   1          {
+ 151   2              // 关键：TotalLen / 2 是总行数（两个字就是 32 行）
+ 152   2              // 这里计算的是：当前显示的第 i 行，对应整个长数组中的哪一行
+ 153   2              rowindex = (i + ScrollOffset) % (TotalLen / 2);
+ 154   2              
+ 155   2              // 每一行取两个连续字节：rowindex*2 是左字节，rowindex*2+1 是右字节
+ 156   2              Matrix16x16_ShowColumn(i, pArray[rowindex * 2], pArray[rowindex * 2 + 1]);
+ 157   2          }
+ 158   1      
+ 159   1          SpeedCount++;
+ 160   1          if(SpeedCount > Speed)
+ 161   1          {
+ 162   2              SpeedCount = 0;
+ 163   2              ScrollOffset++; 
+ 164   2              
+ 165   2              if(ScrollOffset >= (TotalLen / 2)) 
+ 166   2              {
+ 167   3                  ScrollOffset = 0; 
+ 168   3              }
+ 169   2          }
+ 170   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    533    ----
+   CONSTANT SIZE    =    144    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     21      24
+C51 COMPILER V9.60.7.0   MATRIX                                                            03/16/2026 17:41:44 PAGE 4   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
