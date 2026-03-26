@@ -1,0 +1,8 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\Key.obj",
+".\Objects\LCD1602.obj",
+".\Objects\Seg.obj" 
+TO ".\Objects\HUYF" 
+PRINT(".\Listings\HUYF.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 
