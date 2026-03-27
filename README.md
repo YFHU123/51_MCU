@@ -15,7 +15,7 @@
 | :--- | :--- |
 | **Docs** | 硬件原理图、芯片 Datasheet 及相关技术文档 |
 | **Examples** | 各类实验案例（流水灯、数码管、LCD、传感器等） |
-| **Module** | 封装好的通用驱动库（如 1-Wire, I2C, ds1302 等） |
+| **Module** | 封装好的通用驱动库（如 SEG, KEY, UART 等） |
 | **simulation** | Proteus 仿真工程文件 |
 
 ## 🛠️ 实验案例清单
