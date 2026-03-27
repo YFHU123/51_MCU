@@ -23,7 +23,7 @@ void Delay(unsigned int i) {
 void main() {
     unsigned char i;
     while (1) {
-        for (i = 0; i < 14; i++) {
+        for (i = 0; i < sizeof(tab); i++) {
             P1 = tab[i];
             Delay(500);
         }
