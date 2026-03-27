@@ -17,7 +17,6 @@ unsigned char LED_Mode = MODE_OFF;
 unsigned int  LED_Timer = 0;   
 unsigned char LED_Data = 0xFE; 
 
-// --- 修改点1：初始密码长度改为6位 ---
 unsigned char Password[] = {1, 2, 3, 4, 5, 6}; 
 unsigned char InputBuf[6];               // 缓冲区也改为6
 unsigned char InputCount = 0;            
@@ -49,7 +48,7 @@ void Check_Password()
 void Lcd_Proc()
 {
     unsigned char i;
-    if(!Lcd_Update_Flag) return; 
+    if(!Lcd_Update_Flag) return; //只有按键按下，LCD才会刷新
     Lcd_Update_Flag = 0; 
     
     if(Setting_Mode == 1) 
@@ -97,7 +96,6 @@ void Key_Proc()
     {
         Lcd_Update_Flag = 1;
 
-        // --- 修改点4：判断上限改为6 ---
         if(Key_Down <= 10 && InputCount < 6)
         {
             if(Setting_Mode == 0 && Lock_State != 0) {

@@ -1,0 +1,86 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              03/10/2026 17:31:23 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\TOOLS\Keil5\MDK\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver) DEBUG OBJECTEX
+                    -TEND PRINT(.\Listings\main.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <intrins.h>
+   2          #include <reg52.h>
+   3          #include "Key.h"
+   4          
+   5          
+   6          /*引脚定义 */
+   7          sbit LED1 = P1^0;
+   8          
+   9          /* 变量声明区 */
+  10          unsigned char Key_Slow_Down;//按键减速
+  11          unsigned char Key_Val,Key_Old,Key_Down,Key_Up;
+  12           
+  13          /* 按键处理函数 */
+  14          void Key_Proc()
+  15          {
+  16   1          if(Key_Slow_Down) return;//阀门
+  17   1          Key_Slow_Down = 1;
+  18   1       
+  19   1          Key_Val = Key_Read();//实时读取键码值
+  20   1          Key_Down = Key_Val & (Key_Old ^ Key_Val);//读取下降沿
+  21   1          Key_Up = ~Key_Val & (Key_Old ^ Key_Val);//读取上升沿
+  22   1          Key_Old = Key_Val;//传递旧值
+  23   1      
+  24   1          //按键逻辑
+  25   1              if(Key_Down == 1) LED1 = ~LED1;
+  26   1      }
+  27           
+  28          /* 定时器0初始化函数 */
+  29          void Timer0_Init(void)          //1毫秒@12.000MHz
+  30          {
+  31   1          TMOD &= 0xF0;                       //设置定时器模式
+  32   1          TL0 = 0x20;                         //设置定时初始值
+  33   1          TH0 = 0xD1;                         //设置定时初始值
+  34   1          TF0 = 0;                            //清除TF0标志
+  35   1          TR0 = 1;                            //定时器0开始计时
+  36   1          ET0 = 1;
+  37   1          EA = 1;
+  38   1      }
+  39           
+  40          /* 定时器0中断服务函数 */
+  41          void Timer0Sever() interrupt 1
+  42          {
+  43   1          //重装载（89C52）
+  44   1              TL0 = 0x18;                             //设置定时初始值
+  45   1              TH0 = 0xFC;                             //设置定时初始值
+  46   1          
+  47   1          if(++Key_Slow_Down == 10) Key_Slow_Down = 0;//按键轮询 10ms
+  48   1      }
+  49          
+  50          /* 主函数 */
+  51          void main(void)
+  52          {
+  53   1          Timer0_Init();            
+  54   1          while(1)
+C51 COMPILER V9.60.7.0   MAIN                                                              03/10/2026 17:31:23 PAGE 2   
+
+  55   1          {
+  56   2              Key_Proc();           
+  57   2              
+  58   2          }
+  59   1      }
+  60          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     89    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
