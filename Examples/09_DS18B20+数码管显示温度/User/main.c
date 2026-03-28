@@ -19,6 +19,8 @@ void Seg_Proc()
     Seg_Slow_Down = 0;
 
     t = Read_Temperature();
+
+    if(t == 85.0) return;
     
     Seg_Buf[0] = (unsigned char)t / 10 % 10;
     Seg_Buf[1] = (unsigned char)t % 10;
