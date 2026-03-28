@@ -52,12 +52,11 @@ void I2C_SendByte(unsigned char Byte)
 unsigned char I2C_ReceiveByte(void)
 {
 	unsigned char i,Byte=0x00;
-	I2C_SDA=1;// 释放SDA
+	I2C_SDA=1;
 	for(i=0;i<8;i++)
 	{
 		I2C_SCL=1;
-		if(I2C_SDA) 
-			Byte|=(0x80>>i);
+		if(I2C_SDA){Byte|=(0x80>>i);}
 		I2C_SCL=0;
 	}
 	return Byte;
