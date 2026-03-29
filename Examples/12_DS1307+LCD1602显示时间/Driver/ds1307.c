@@ -1,74 +1,65 @@
 #include <intrins.h>
 #include "ds1307.h"
+#include "I2C.h"
 
-//引脚定义
-sbit SCL = P2^1; 
-sbit SDA = P2^0;
 
-/* IIC 总线基础信号 */
-void IIC_Start() {
-    SDA = 1; SCL = 1; _nop_();
-    SDA = 0; _nop_();
-    SCL = 0;
-}
-
-void IIC_Stop() {
-    SDA = 0; SCL = 1; _nop_();
-    SDA = 1; _nop_();
-}
-
-void IIC_SendByte(unsigned char dat) {
-    unsigned char i;
-    for(i=0; i<8; i++) {
-        SDA = dat >> 7; // IIC 高位在前
-        dat <<= 1;
-        SCL = 1; _nop_(); SCL = 0;
-    }
-    SDA = 1; SCL = 1; _nop_(); SCL = 0; // 释放 SDA 等待应答
-}
-
-unsigned char IIC_RecvByte() {
-    unsigned char i, dat = 0;
-    SDA = 1; 
-    for(i=0; i<8; i++) {
-        SCL = 1; _nop_();
-        dat <<= 1;
-        if(SDA) dat |= 0x01;
-        SCL = 0;
-    }
-    return dat;
-}
-
-/* DS1307 读字节 */
+/**
+ * @brief 写入 DS1307 寄存器
+ * @param addr 寄存器地址
+ * @param dat 数据
+ */
 void Write_Ds1307_Byte(unsigned char addr, unsigned char dat) {
-    IIC_Start();
-    IIC_SendByte(0xD0); // DS1307 写地址
-    IIC_SendByte(addr); 
-    IIC_SendByte(dat);  
-    IIC_Stop();
+    I2C_Start();
+    I2C_SendByte(0xD0);     // 设备地址
+    I2C_ReceiveAck();       // 必须接收应答
+    
+    I2C_SendByte(addr);     // 寄存器地址
+    I2C_ReceiveAck();       // 必须接收应答
+    
+    I2C_SendByte(dat);      // 写入数据
+    I2C_ReceiveAck();       // 必须接收应答
+    
+    I2C_Stop();
 }
 
-/* DS1307 写字节 */
+/**
+ * @brief 读取 DS1307 寄存器
+ * @param addr 寄存器地址
+ * @return 数据
+ */
 unsigned char Read_Ds1307_Byte(unsigned char addr) {
     unsigned char dat;
-    IIC_Start();
-    IIC_SendByte(0xD0); 
-    IIC_SendByte(addr);
-    IIC_Start();        // 重启总线进行读取
-    IIC_SendByte(0xD1); // DS1307 读地址
-    dat = IIC_RecvByte();
-    IIC_Stop();
+    I2C_Start();
+    I2C_SendByte(0xD0); 
+    if(I2C_ReceiveAck()) return 0; // 如果没应答，直接返回
+    
+    I2C_SendByte(addr);
+    I2C_ReceiveAck();
+    
+    I2C_Start();        // 重启总线 (Restart)
+    I2C_SendByte(0xD1); 
+    I2C_ReceiveAck();
+    
+    dat = I2C_RecvByte();
+    I2C_SendAck(1);     // 【关键】读取最后一个字节后发送 NACK (1)
+    I2C_Stop();
     return dat;
 }
 
-/* 设置时间：数组格式为 [时, 分, 秒]，必须是 BCD 码 */
+/**
+ * @brief 设置 DS1307 时间
+ * @param ucRtc 时间数组，格式为 [时, 分, 秒]，必须是 BCD 码
+ */
 void Set_Rtc(unsigned char *ucRtc) {
     Write_Ds1307_Byte(0x02, ucRtc[0]); // 时
     Write_Ds1307_Byte(0x01, ucRtc[1]); // 分
     Write_Ds1307_Byte(0x00, ucRtc[2]); // 秒 
 }
 
-/* 读取时间：数组格式为 [时, 分, 秒] */
+/**
+ * @brief 读取 DS1307 时间
+ * @param ucRtc 时间数组，格式为 [时, 分, 秒]，必须是 BCD 码
+ */
 void Read_Rtc(unsigned char *ucRtc) {
     ucRtc[0] = Read_Ds1307_Byte(0x02); // 时
     ucRtc[1] = Read_Ds1307_Byte(0x01); // 分

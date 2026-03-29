@@ -1,8 +1,6 @@
 /* 头文件声明区 */
 #include <reg52.h>
 #include <intrins.h>
-#include "Seg.h"
-#include "Key.h"
 #include "ds1307.h"
 #include "LCD1602.h"
 

@@ -19,6 +19,8 @@ virtualFolder:
         - path: ../Driver/ds1307.h
         - path: ../Driver/Seg.c
         - path: ../Driver/Seg.h
+        - path: ../Driver/I2C.c
+        - path: ../Driver/I2C.h
       folders: []
 dependenceList: []
 outDir: build
